@@ -1,95 +1,49 @@
-# from tkinter import *
-# from tkinter import messagebox
-   
-# class TastyTracker:
-#     def __init__(self, master):
-#         self.master = master
-#         master.title("tasy tracker")
-#         master.geometry("1920x1080")
-#         master.configure(bg= "pink")
-        
-#         self.greet_button = Button(master, text="Masuk", bg="white", command=self.masuk, font="Halvetica 16 bold")
-#         self.greet_button.configure(width=10, height=2)
-#         self.greet_button.place(x= 700, y=400)
-#         self.close_button = Button(master, text="Keluar", bg="white", fg="#8530d1", command=master.destroy, font="Halvetica 16 bold")
-#         self.close_button.configure(width=10, height=2)
-#         self.close_button.place(x=700, y=500)
-
-#     def masuk(self):
-#         self.master.withdraw()  
-#         page1 = Toplevel(self.master)
-#         page1.title("Welcome to Tasty Tracker")
-#         page1.configure(bg="pink")
-#         Label(page1, text="Welcome to tasty tracker", font="courier 18 bold", fg="red", bg="pink").pack()
-#         page1.geometry("1920x1080")
-#         page1.deiconify()
-
-#         add_recipe_button = Button(page1, text="Tambah Resep", bg="white", command=self.tambah_resep, font="Helvetica 16 bold")
-#         add_recipe_button.configure(width=15, height=2)
-#         add_recipe_button.pack(pady=20)
-
-#         page1.geometry("1920x1080")
-#         page1.deiconify()
-
-#     def tambah_resep(self):
-#         # Fungsi ini akan menampilkan form untuk menambah resep
-#         form = Toplevel(self.master)
-#         form.title("Tambah Resep Baru")
-#         form.geometry("500x300")
-#         form.configure(bg="pink")
-
-#         # Label dan Entry untuk nama resep
-#         Label(form, text="Nama Resep:", font="Helvetica 12 bold", bg="pink").pack()
-#         name_entry = Entry(form, font="Helvetica 12")
-#         name_entry.pack()
-
-#         # Label dan Entry untuk bahan resep
-#         Label(form, text="Bahan (pisahkan dengan koma):", font="Helvetica 12 bold", bg="pink").pack()
-#         ingredients_entry = Entry(form, font="Helvetica 12")
-#         ingredients_entry.pack()
-
-#         # Button untuk menambah resep
-#         add_button = Button(form, text="Tambah Resep", bg="white", command=lambda: self.simpan_resep(name_entry.get(), ingredients_entry.get()), font="Helvetica 12 bold")
-#         add_button.pack(pady=20)
-
-#     def simpan_resep(self, nama_resep, bahan_resep):
-#         # Fungsi ini akan menyimpan resep ke dalam database atau melakukan tindakan sesuai kebutuhan
-#         messagebox.showinfo("Info", f"Resep {nama_resep} berhasil ditambahkan!")
-    
-# root = Tk()
-# app = TastyTracker(master=root)
-# root.mainloop()
-
+import json
 from tkinter import *
 from tkinter import messagebox
+from tkinter import Tk, Label
+from PIL import Image, ImageTk
+from tkinter import PhotoImage
 
 class TastyTracker:
     def __init__(self, master):
+    
         self.master = master
         master.title("Tasty Tracker")
         master.geometry("1920x1080")
-        master.configure(bg="pink")
+        master.configure(bg="#F7CACA")
 
-        self.greet_button = Button(master, text="Masuk", bg="white", command=self.masuk, font="Helvetica 16 bold")
+        self.label = Label(master, text="TASTY TRACKER", font="Forte 60 bold", bg="#F7CACA")
+        self.label.configure(width=15, height=5)
+        self.label.place(x=430, y=100)
+        self.greet_button = Button(master, text="Masuk", bg="#93A9D1", fg="white", command=self.masuk, font="Halvetica 16 bold")
         self.greet_button.configure(width=10, height=2)
         self.greet_button.place(x=700, y=400)
-        self.close_button = Button(master, text="Keluar", bg="white", fg="#8530d1", command=master.destroy, font="Helvetica 16 bold")
+        self.close_button = Button(master, text="Keluar", bg="white", fg="#93A9D1", command=master.destroy, font="Helvetica 16 bold")
         self.close_button.configure(width=10, height=2)
         self.close_button.place(x=700, y=500)
 
-        self.label = Label(master, text="TASTY TRACKER", font="Forte 60 bold", bg= "pink")
-        self.label.configure(width=15, height=5)
-        self.label.place(x=345,y=100)
-
         # Database sederhana untuk menyimpan resep
         self.recipes = []
+
+        # Load recipes from file when the program starts
+        self.load_recipes_from_file()
+
+        self.image_path = "C:/Users/LUNA/Downloads/judul2.png"  # Replace with the actual path
+        self.image = PhotoImage(file=self.image_path)
+        self.image_label = Label(master, image=self.image, bg="#F7CACA")
+        self.image_label.place(x=300, y=200)  # Adjust the coordinates as needed
+
+
 
     def masuk(self):
         self.master.withdraw()
         page1 = Toplevel(self.master)
         page1.title("Welcome to Tasty Tracker")
-        page1.configure(bg="pink")
-        Label(page1, text="Welcome to Tasty Tracker", font="courier 18 bold", fg="red", bg="pink").pack()
+        page1.configure(bg="#F7CACA")
+        page1.attributes('-fullscreen', True)  # Open in full-screen mode
+
+        Label(page1, text="Welcome to Tasty Tracker", font="courier 22 bold", fg="red", bg="pink").pack(pady=50)
 
         # Entry untuk pencarian berdasarkan nama bahan
         search_label = Label(page1, text="Cari Resep berdasarkan Nama Bahan:", font="Helvetica 12 bold", bg="pink")
@@ -107,30 +61,42 @@ class TastyTracker:
         add_recipe_button.pack(pady=20)
 
         # LabelFrame untuk menampilkan resep-resep
-        recipe_label_frame = LabelFrame(page1, text="Resep-resep", font="Helvetica 12 bold", bg="pink")
-        recipe_label_frame.pack(padx=20, pady=20, expand=True, fill="both")
+        recipe_label_frame = LabelFrame(page1, text="Resep-Resep Rekomendasi", font="Helvetica 18 bold")
+        recipe_label_frame.pack(padx=80, pady=35, expand=True, fill="both")
 
         # Listbox untuk menampilkan resep-resep
-        self.recipe_listbox = Listbox(recipe_label_frame, font="Helvetica 12", selectmode=SINGLE)
-        self.recipe_listbox.pack(expand=True, fill="both")
+        self.recipe_listbox = Listbox(recipe_label_frame, font="Courtier 16", selectmode=SINGLE)
+        self.recipe_listbox.pack(expand=True, fill="both", side=LEFT)
 
         # Scrollbar untuk Listbox
         scrollbar = Scrollbar(recipe_label_frame)
-        scrollbar.pack(side=RIGHT, fill="y")
+        scrollbar.pack(side=RIGHT, fill=Y)
         self.recipe_listbox.config(yscrollcommand=scrollbar.set)
         scrollbar.config(command=self.recipe_listbox.yview)
 
         # Binding untuk mengaktifkan event ketika item di Listbox diklik
         self.recipe_listbox.bind("<Double-Button-1>", self.tampilkan_detail_resep)
 
+        # Button untuk kembali ke halaman utama
+        back_button = Button(page1, text="Kembali", bg="white", command=lambda: self.kembali(page1), font="Helvetica 12 bold")
+        back_button.pack(pady=20, padx=10, side=RIGHT)
+
+        # Load recipes into the listbox
+        self.load_recipes_to_listbox()
+
         page1.geometry("1920x1080")
         page1.deiconify()
+
+
+    def kembali(self, page):
+        page.destroy()
+        self.master.deiconify()
 
     def tambah_resep(self):
         # Fungsi ini akan menampilkan form untuk menambah resep
         form = Toplevel(self.master)
         form.title("Tambah Resep Baru")
-        form.geometry("500x400")
+        form.geometry("500x500")
         form.configure(bg="pink")
 
         # Label dan Entry untuk nama resep
@@ -144,7 +110,7 @@ class TastyTracker:
         ingredients_entry.pack()
 
         # Label dan Entry untuk langkah-langkah resep
-        Label(form, text="Langkah-langkah:", font="Helvetica 12 bold", bg="pink").pack()
+        Label(form, text="Langkah-Langkah:", font="Helvetica 12 bold", bg="pink").pack()
         steps_entry = Entry(form, font="Helvetica 12")
         steps_entry.pack()
 
@@ -154,40 +120,105 @@ class TastyTracker:
 
     def simpan_resep(self, nama_resep, bahan_resep, langkah_resep):
         # Fungsi ini akan menyimpan resep ke dalam database atau melakukan tindakan sesuai kebutuhan
-        self.recipes.append({"name": nama_resep, "ingredients": bahan_resep, "steps": langkah_resep})
-        self.update_recipe_listbox(nama_resep)
+        new_recipe = {"name": nama_resep, "ingredients": bahan_resep, "steps": langkah_resep}
+        self.recipes.append(new_recipe)
+        self.update_recipe_listbox(new_recipe)
 
-    def update_recipe_listbox(self, nama_resep):
+        # Save recipes to file after adding a new recipe
+        self.save_recipes_to_file()
+
+    def update_recipe_listbox(self, new_recipe):
         # Fungsi ini akan menambahkan nama resep ke dalam Listbox
-        self.recipe_listbox.insert(END, nama_resep)
+        rating = new_recipe.get("rating", "N/A")
+        self.recipe_listbox.insert(END, f"{new_recipe['name']} - Rating: {rating}")
 
     def tampilkan_detail_resep(self, event):
         # Fungsi ini akan menampilkan laman baru dengan detail resep
-        selected_index = self.recipe_listbox.curselection()
-        if selected_index:
-            selected_recipe = self.recipes[selected_index[0]]
+        selected_item = self.recipe_listbox.get(self.recipe_listbox.curselection())
+        selected_name = selected_item.split(" - ")[0]
+        selected_recipe = next((recipe for recipe in self.recipes if recipe["name"] == selected_name), None)
+
+        if selected_recipe:
             detail_laman = Toplevel(self.master)
             detail_laman.title(selected_recipe["name"])
-            detail_laman.geometry("500x400")
+            detail_laman.geometry("600x500")
 
             # Menampilkan informasi resep di laman baru
             Label(detail_laman, text=f"Nama Resep: {selected_recipe['name']}", font="Helvetica 14 bold").pack(pady=10)
             Label(detail_laman, text=f"Bahan: {selected_recipe['ingredients']}", font="Helvetica 12").pack(pady=5)
-            Label(detail_laman, text=f"Langkah-langkah: {selected_recipe['steps']}", font="Helvetica 12").pack(pady=5)
+            Label(detail_laman, text=f"Langkah-Langkah: {selected_recipe['steps']}", font="Helvetica 12").pack(pady=5)
+
+            # Rating scale with steps of 0.5
+            Label(detail_laman, text="Rating:", font="Helvetica 12 bold").pack()
+            rating_scale = Scale(detail_laman, from_=1, to=5, resolution=0.5, orient=HORIZONTAL)
+            rating_scale.set(selected_recipe.get("rating", 0))
+            rating_scale.pack(pady=10)
+
+            # Button untuk menyimpan rating
+            save_rating_button = Button(detail_laman, text="Simpan Rating", bg="white", command=lambda: self.update_rating_and_order(selected_name, rating_scale.get()), font="Helvetica 12 bold")
+            save_rating_button.pack(pady=10)
+
+            # Button untuk menutup laman detail
+            close_button = Button(detail_laman, text="Tutup", bg="white", command=detail_laman.destroy, font="Helvetica 12 bold")
+            close_button.pack(pady=10)
+
+    def update_rating_and_order(self, selected_name, rating):
+        # Update the rating for the selected recipe
+        selected_recipe = next((recipe for recipe in self.recipes if recipe["name"] == selected_name), None)
+
+        if selected_recipe:
+            selected_recipe["rating"] = rating
+
+        # Save recipes to file after updating the rating
+        self.save_recipes_to_file()
+
+        # Update the order of the recipe list based on the rating (descending order)
+        self.update_recipe_order()
+
 
     def cari_resep(self):
         # Fungsi ini akan mencari resep berdasarkan nama bahan
         keyword = self.search_entry.get().lower()
-        matching_recipes = [recipe["name"] for recipe in self.recipes if keyword in recipe["ingredients"].lower()]
-        
+        matching_recipes = [recipe for recipe in self.recipes if keyword in recipe["ingredients"].lower()]
+
         # Membersihkan Listbox sebelum menampilkan hasil pencarian baru
         self.recipe_listbox.delete(0, END)
-        
+
         # Menampilkan hasil pencarian di Listbox
         for recipe in matching_recipes:
-            self.recipe_listbox.insert(END, recipe)
+            rating = recipe.get("rating", "N/A")
+            self.recipe_listbox.insert(END, f"{recipe['name']} - Rating: {rating}")
+
+    def save_recipes_to_file(self):
+        # Simpan resep ke dalam file teks menggunakan format JSON
+        with open("recipes.json", "w") as file:
+            json.dump(self.recipes, file)
+
+    def load_recipes_from_file(self):
+        # Coba untuk memuat resep dari file teks jika ada
+        try:
+            with open("recipes.json", "r") as file:
+                self.recipes = json.load(file)
+        except FileNotFoundError:
+            # File tidak ditemukan, tidak ada resep yang dimuat
+            pass
+
+    def load_recipes_to_listbox(self):
+        # Memuat resep ke dalam Listbox saat program dimulai
+        for recipe in self.recipes:
+            rating = recipe.get("rating", "N/A")
+            self.recipe_listbox.insert(END, f"{recipe['name']} - Rating: {rating}")
+
+    def update_recipe_order(self):
+        # Update the order of the recipe list based on the rating (descending order)
+        self.recipes.sort(key=lambda x: x.get("rating", 0), reverse=True)
+        self.recipe_listbox.delete(0, END)
+        for recipe in self.recipes:
+            rating = recipe.get("rating", "N/A")
+            self.recipe_listbox.insert(END, f"{recipe['name']} - Rating: {rating}")
 
 if __name__ == "__main__":
     root = Tk()
     app = TastyTracker(master=root)
     root.mainloop()
+
